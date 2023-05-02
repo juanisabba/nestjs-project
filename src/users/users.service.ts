@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, Like, Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from 'src/auth/dto/login.dto';
 import { IUser } from './models/user.interface';
@@ -34,7 +34,7 @@ export class UsersService {
       throw new HttpException('error', 404);
     }
   }
-  
+
   findAll({
     limit,
     page,
@@ -43,6 +43,15 @@ export class UsersService {
     return paginate<User>(this.userRepository, { limit, page, route });
   }
 
+  filterBy({ limit, page }: IPaginationOptions, user: IUser) {
+    return this.userRepository.findAndCount({
+      skip: (Number(page) - 1) * Number(limit) || 0,
+      take: Number(limit) || 10,
+      order: { id: 'ASC' },
+      select: ['id', 'name', 'username', 'email', 'role'],
+      where: [{ username: Like(`%${user.username}%`) }],
+    });
+  }
   async findOne(id: number) {
     const user = await this.userRepository.findOne({
       where: {

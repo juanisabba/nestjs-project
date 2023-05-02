@@ -38,13 +38,20 @@ export class UsersController {
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
-  ): Promise<Pagination<User>> {
-    limit = limit > 100 ? 100 : limit;
-    return this.usersService.findAll({
-      page,
-      limit,
-      route: 'http://localhost:3001/api/users',
-    });
+    @Query('username') username: string
+  ) {
+    if(!username){
+      return this.usersService.findAll({
+        page,
+        limit,
+        route: 'http://localhost:3001/api/users',
+      });
+    }else{
+      return this.usersService.filterBy(
+        { page: Number(page), limit: Number(limit), route: 'http://localhost:3000/api/users' },
+        { username }
+    )
+    }
   }
 
   @Get(':id')
