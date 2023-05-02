@@ -21,6 +21,9 @@ export class User {
   @Column({type: 'enum', enum: ROLES_ENUM})
   role: ROLES_ENUM;
 
+	@Column({nullable: true})
+	profilePicture?: string;
+
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
