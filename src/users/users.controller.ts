@@ -7,12 +7,19 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from 'src/auth/dto/login.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ROLES_ENUM } from 'src/constants/roles.enum';
+import { IUser } from './models/user.interface';
+import { AdminAccess } from 'src/auth/decorators/admin.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -30,6 +37,8 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard) 
+  @Roles(ROLES_ENUM.EDITOR)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -53,5 +62,11 @@ export class UsersController {
   @Post('login')
   login(@Body() loginDto: LoginDto) {
     return this.usersService.login(loginDto);
+  }
+  @UseGuards(JwtAuthGuard, RolesGuard) 
+  @AdminAccess()
+  @Patch(':id/roles')
+  updateRole(@Param('id') id: string, @Body() user: IUser){
+    return this.usersService.updateRole(+id, user)
   }
 }

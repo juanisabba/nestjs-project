@@ -8,8 +8,8 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   generateJwt(user: User) {
-    const { email, id, name, username } = user;
-    return this.jwtService.signAsync({ id, email, username, name });
+    const { email, id, name, username, role } = user;
+    return this.jwtService.signAsync({ id, name, username, email, role });
   }
 
   hashPassword(password: string) {

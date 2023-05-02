@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from 'src/auth/dto/login.dto';
+import { ROLES_ENUM } from 'src/constants/roles.enum';
+import { IUser } from './models/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +19,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const { password } = createUserDto;
     try {
-      const hashPassword = await this.authService.hashPassword(password)
+      const hashPassword = await this.authService.hashPassword(password);
       createUserDto.password = hashPassword;
       const user = this.userRepository.create(createUserDto);
       if (!user) {
@@ -49,7 +51,7 @@ export class UsersService {
         email,
       },
     });
-    if(!user) return null
+    if (!user) return null;
     return user;
   }
 
@@ -73,14 +75,27 @@ export class UsersService {
     return this.userRepository.delete({ id });
   }
 
-    async login(loginDto: LoginDto) {
-    const {email, password} = loginDto
-    const user: User = await this.findByEmail(email)
-    if(!user) throw new HttpException('not found', 404)
-    const comparePasswords = await this.authService.comparePasswords(user.password, password)
-    if(!comparePasswords) throw new HttpException('contraseña incorrecta', 400)
-    const token = await this.authService.generateJwt(user)
-    return {token}
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+    const user: User = await this.findByEmail(email);
+    if (!user) throw new HttpException('not found', 404);
+    const comparePasswords = await this.authService.comparePasswords(
+      user.password,
+      password,
+    );
+    if (!comparePasswords)
+      throw new HttpException('contraseña incorrecta', 400);
+    const token = await this.authService.generateJwt(user);
+    return { token };
   }
 
+  async updateRole(id: number, user: IUser) {
+    const options: FindOneOptions<User> = {
+      where: { id },
+    };
+    const findUser = await this.userRepository.find(options);
+    if (findUser.length === 0)
+      throw new HttpException('usuario no encontrado', 404);
+    return this.userRepository.update(id, user);
+  }
 }

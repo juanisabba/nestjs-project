@@ -1,3 +1,4 @@
+import { ROLES_ENUM } from 'src/constants/roles.enum';
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 
 @Entity('users')
@@ -16,6 +17,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({type: 'enum', enum: ROLES_ENUM})
+  role: ROLES_ENUM;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
