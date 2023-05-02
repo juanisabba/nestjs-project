@@ -4,27 +4,27 @@ import { ROLES_ENUM } from 'src/constants/roles.enum';
 
 export class UpdateUserDto {
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   username?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   email?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   password?: string;
   
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(ROLES_ENUM)
   role?: ROLES_ENUM;
 

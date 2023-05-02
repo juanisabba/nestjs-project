@@ -26,6 +26,7 @@ import { LoginDto } from 'src/auth/dto/login.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { join } from 'path';
 import { of } from 'rxjs';
+import { UserIsUserGuard } from 'src/auth/guards/userIsUser.guard';
 
 export const storage = {
   storage: diskStorage({
@@ -83,6 +84,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard, UserIsUserGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
