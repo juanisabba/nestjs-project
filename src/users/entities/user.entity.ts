@@ -1,5 +1,6 @@
+import { BlogEntry } from 'src/blogs/entities/blog-entry.entity';
 import { ROLES_ENUM } from 'src/constants/roles.enum';
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToMany } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -27,8 +28,12 @@ export class User {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @OneToMany(()=> BlogEntry,blog => blog.author )
+  blogs: BlogEntry[]
+  
   @BeforeInsert()
   emailToLowerCase(){
     this.email = this.email.toLocaleLowerCase()
   }
+
 }
