@@ -1,15 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BlogEntry } from './entities/blog-entry.entity';
+import { Repository } from 'typeorm';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class BlogsService {
-  create(createBlogDto: CreateBlogDto) {
-    return 'This action adds a new blog';
+  constructor(
+    @InjectRepository(BlogEntry) private readonly blogsRepository: Repository<BlogEntry>,
+    private readonly usersService: UsersService
+  ){}
+  async create(user, createBlogDto: CreateBlogDto) {
+    try {      
+      const findUser = await this.usersService.findOne(user.id)
+      const createPost = await this.blogsRepository.create({...createBlogDto, author: findUser})
+      return this.blogsRepository.save(createPost)
+    } catch (error) {
+      throw new HttpException(error, 500)
+    }
+
+return
   }
 
   findAll() {
-    return `This action returns all blogs`;
+    return this.blogsRepository.find({
+      relations: ['author']
+    });
   }
 
   findOne(id: number) {

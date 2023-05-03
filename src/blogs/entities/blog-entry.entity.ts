@@ -9,9 +9,6 @@ export class BlogEntry {
   @Column()
   title: string;
 
-  @Column()
-  slug: string;
-
   @Column({default: ''})
   description: string;
 
@@ -32,13 +29,10 @@ export class BlogEntry {
   @Column({default: 0})
   likes: number
 
-  @Column()
+  @Column({nullable: true})
   headerImage: string
 
-  @Column()
-  publishedDate: Date
-
-  @Column()
+  @Column({default: true})
   isPublished: boolean
 
   @ManyToOne(()=> User, user => user.blogs )

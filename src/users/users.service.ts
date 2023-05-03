@@ -40,7 +40,12 @@ export class UsersService {
     page,
     route,
   }: IPaginationOptions): Promise<Pagination<User>> {
-    return paginate<User>(this.userRepository, { limit, page, route });
+    return paginate<User>(
+      this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.blogs', 'blogs'),
+      { limit, page, route },
+    );
   }
 
   filterBy({ limit, page }: IPaginationOptions, user: IUser) {
@@ -57,6 +62,7 @@ export class UsersService {
       where: {
         id,
       },
+      relations: ['blogs'],
     });
     if (!user) return new HttpException('User not found', 404);
     return user;
